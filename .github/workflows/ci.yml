@@ -1,0 +1,43 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  lint-and-unit:
+    name: Lint & Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install and Test (Should Fail)
+        run: |
+          cd frontend
+          npm ci
+          npx jest --coverage --coverageThreshold='{"global":{"lines":80}}'
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: lint-and-unit
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Bandit
+        run: |
+          pip install bandit
+          bandit -r backend/ -ll
+
+  e2e-tests:
+    name: E2E Tests (Playwright)
+    runs-on: ubuntu-latest
+    needs: [lint-and-unit, security-scan]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Playwright
+        run: npx playwright test
