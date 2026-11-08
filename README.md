@@ -1,3 +1,5 @@
+![CI/CD](https://github.com/andrey5e/LR_3_TestingPS/actions/workflows/ci.yml/badge.svg)
+
 # E-Commerce Platform
 
 ## Overview
